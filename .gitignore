@@ -1,0 +1,115 @@
+# ============================================================
+# Job Intelligent - .gitignore (Garde les fichiers Python)
+# ============================================================
+
+# -------------------------------
+# Docker & Volumes (données générées)
+# -------------------------------
+volumes/
+docker/volumes/
+*.tar.gz
+*.tar
+
+# Garder docker-compose.yml
+!docker-compose.yml
+
+# -------------------------------
+# Logs (générés)
+# -------------------------------
+logs/
+*.log
+airflow_logs/
+flink/checkpoints/
+spark/logs/
+spark/work/
+
+# -------------------------------
+# Airflow (dossiers générés)
+# -------------------------------
+airflow_logs/
+airflow_config/
+airflow_plugins/
+*.db
+*.pid
+*.lock
+
+# -------------------------------
+# Python - IGNORE SEULEMENT LES FICHIERS COMPILES
+# -------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.Python
+.pytest_cache/
+*.egg-info/
+*.egg
+
+# NE PAS ignorer les fichiers .py sources
+!*.py
+
+# -------------------------------
+# Virtual Environment
+# -------------------------------
+venv/
+env/
+ENV/
+.venv/
+
+# -------------------------------
+# Modèles ML (trop lourds)
+# -------------------------------
+spark/models/*.model
+spark/models/*.pkl
+spark/models/*.joblib
+*.pkl
+*.joblib
+
+# Garder les scripts Python dans ml_jobs
+!spark/ml_jobs/*.py
+
+# -------------------------------
+# Données
+# -------------------------------
+*.csv
+*.parquet
+minio-data/
+postgres-data/
+
+# Garder les fichiers JSON de config
+!*.json
+
+# -------------------------------
+# Kafka
+# -------------------------------
+kafka-data/
+__consumer_offsets/
+
+# -------------------------------
+# Secrets
+# -------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.secret
+
+# -------------------------------
+# IDE
+# -------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# -------------------------------
+# Temporaires
+# -------------------------------
+tmp/
+temp/
+*.tmp
+*.bak
