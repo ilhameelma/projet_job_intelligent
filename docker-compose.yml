@@ -56,7 +56,9 @@ services:
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "2181"]
       interval: 10s
-      retries: 5
+      timeout: 10s
+      retries: 10
+      start_period: 40s
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -83,7 +85,8 @@ services:
       test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:29092"]
       interval: 15s
       timeout: 10s
-      retries: 5
+      retries: 10
+      start_period: 60s
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -619,6 +622,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 20s
 
 # =============================================================
 # VOLUMES
