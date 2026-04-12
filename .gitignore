@@ -74,11 +74,15 @@ spark/models/*.joblib
 # -------------------------------
 *.csv
 *.parquet
+*.json 
 minio-data/
 postgres-data/
 
-# Garder les fichiers JSON de config
-!*.json
+# Exception : garder SEULEMENT les JSON de configuration
+!config.json
+!package.json
+!.env.example
+!example_offer.json   # Si vous voulez garder un exemple
 
 # -------------------------------
 # Kafka
