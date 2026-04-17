@@ -1,6 +1,7 @@
 -- ============================================================
 -- DATA WAREHOUSE JOB INTELLIGENT - MODÈLE ÉTOILE
 -- Schéma GOLD pour les données enrichies
+-- Version corrigée (colonnes élargies pour WTTJ)
 -- ============================================================
 
 -- Créer le schéma gold
@@ -18,17 +19,17 @@ CREATE TABLE IF NOT EXISTS gold.competences (
     nom VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 3. TABLE OFFRES (Table des faits)
+-- 3. TABLE OFFRES (Table des faits) - VERSION CORRIGÉE
 CREATE TABLE IF NOT EXISTS gold.offres (
-    id_offre VARCHAR(100) PRIMARY KEY,
+    id_offre VARCHAR(255) PRIMARY KEY,           -- ← élargi (IDs WTTJ longs)
     id_entreprise INTEGER REFERENCES gold.entreprises(id_entreprise),
     source VARCHAR(50),
     titre_original TEXT,
     titre_clean TEXT,
-    ville VARCHAR(100),
-    lieu_original TEXT,
+    ville VARCHAR(255),                          -- ← élargi
+    lieu_original VARCHAR(500),                  -- ← élargi
     type_contrat VARCHAR(50),
-    type_contrat_original VARCHAR(50),
+    type_contrat_original VARCHAR(100),          -- ← élargi
     salaire_mensuel INTEGER,
     description_clean TEXT,
     description_length INTEGER,
@@ -42,12 +43,12 @@ CREATE TABLE IF NOT EXISTS gold.offres (
     mois INTEGER,
     jour INTEGER,
     url TEXT,
-    query_recherche VARCHAR(100)
+    query_recherche VARCHAR(255)                 -- ← élargi
 );
 
--- 4. TABLE DE LIAISON OFFRE-COMPETENCE
+-- 4. TABLE DE LIAISON OFFRE-COMPETENCE - VERSION CORRIGÉE
 CREATE TABLE IF NOT EXISTS gold.offre_competence (
-    id_offre VARCHAR(100) REFERENCES gold.offres(id_offre),
+    id_offre VARCHAR(255) REFERENCES gold.offres(id_offre),  -- ← élargi
     id_competence INTEGER REFERENCES gold.competences(id_competence),
     PRIMARY KEY (id_offre, id_competence)
 );
