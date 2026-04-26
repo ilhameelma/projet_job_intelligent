@@ -15,8 +15,9 @@ from minio import Minio
 # ============================================================
 # CONFIGURATION MINIO
 # ============================================================
+# APRÈS (correct)
 MINIO_CLIENT = Minio(
-    "localhost:9000",
+    "minio:9000",  # ← Utilise le nom du service Docker
     access_key="minio_admin",
     secret_key="minio_password",
     secure=False
