@@ -5,3 +5,5 @@ kafka-python==2.0.2
 minio==7.2.0
 selenium==4.15.0
 python-dotenv==1.0.0 
+webdriver-manager
+kafka-python

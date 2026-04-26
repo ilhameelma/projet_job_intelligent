@@ -167,9 +167,10 @@ class WelcomeToTheJungleScraper:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/124.0.0.0 Safari/537.36"
         )
+        chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', '/usr/bin/chromedriver')
 
         self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
+            service=Service(chromedriver_path),
             options=options
         )
         self.driver.set_page_load_timeout(self.PAGE_LOAD_TIMEOUT)

@@ -15,10 +15,12 @@ from minio import Minio
 # ============================================================
 # CONFIGURATION MINIO
 # ============================================================
+
+
 MINIO_CLIENT = Minio(
-    "localhost:9000",
-    access_key="minio_admin",
-    secret_key="minio_password",
+    os.environ.get("MINIO_ENDPOINT", "http://minio:9000").replace("http://", ""),
+    access_key=os.environ.get("MINIO_ACCESS_KEY", "minio_admin"),
+    secret_key=os.environ.get("MINIO_SECRET_KEY", "minio_password"),
     secure=False
 )
 BUCKET_BRONZE = "bronze"
