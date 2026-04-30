@@ -51,9 +51,9 @@ class WelcomeToTheJungleScraper:
     MINIO_BUCKET_SILVER = "silver"
 
     # ── Timeouts & scroll ──
-    PAGE_LOAD_TIMEOUT   = 20
-    ELEMENT_TIMEOUT     = 10
-    SCROLL_PAUSE        = 1.5
+    PAGE_LOAD_TIMEOUT   = 30 
+    ELEMENT_TIMEOUT     = 15
+    SCROLL_PAUSE        = 2.0
     SCROLL_MAX_ATTEMPTS = 3
 
     SKILLS = {
@@ -195,7 +195,7 @@ class WelcomeToTheJungleScraper:
     def _accept_cookies(self):
         """Ferme le bandeau cookies — JS click pour contourner les overlays"""
         try:
-            btn = WebDriverWait(self.driver, 8).until(
+            btn = WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.ID, "axeptio_btn_acceptAll"))
             )
             self.driver.execute_script("arguments[0].click();", btn)
@@ -533,7 +533,7 @@ class WelcomeToTheJungleScraper:
 
         try:
             self.driver.get(url)
-            time.sleep(2)
+            time.sleep(5)
             self._accept_cookies()
             WebDriverWait(self.driver, self.PAGE_LOAD_TIMEOUT).until(
                 EC.presence_of_element_located((By.TAG_NAME, "li"))

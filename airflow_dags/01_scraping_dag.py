@@ -41,7 +41,7 @@ with DAG(
     scrape_wttj = BashOperator(
         task_id='scrape_welcometothejungle',
         bash_command=f'bash {SCRIPTS}/scrape_wttj.sh ',
-        execution_timeout=timedelta(minutes=45),  # ← augmenté pour Selenium
+        execution_timeout=timedelta(hours=2),  # ← augmenté pour Selenium
     )
 
     etl_adzuna = BashOperator(
@@ -66,7 +66,7 @@ with DAG(
         task_id='load_to_postgresql',
         bash_command=f'bash {SCRIPTS}/load_pg.sh ',
         execution_timeout=timedelta(minutes=20),
-        trigger_rule=TriggerRule.ALL_DONE,  # ← continue même si wttj échoue
+        trigger_rule=TriggerRule.ALL_DONE,  
     )
 
     check >> [scrape_adzuna, scrape_france, scrape_wttj]
