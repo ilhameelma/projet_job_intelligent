@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Offres - Job Intelligent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo"><span class="logo-icon">⚡</span><span class="logo-text">Job<br>Intelligent</span></a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Accueil</a></li>
+            <li><a href="/offers" class="nav-link active">Offres</a></li>
+            <li><a href="/cv" class="nav-link">Mon CV</a></li>
+            <li><a href="/assistant" class="nav-link">Assistant IA</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login" class="btn-login">Connexion</a>
+            <a href="/signup" class="btn-signup">Commencer gratuitement</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero" style="min-height: auto; padding: 100px 24px 40px;">
+    <div class="search-container" style="max-width: 700px;">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Data Engineer, Paris, CDI..." class="search-input">
+            <button class="search-btn" onclick="performSearch()">🔍 Rechercher</button>
+        </div>
+    </div>
+    <div class="section-header">
+        <h2 class="section-title" id="resultsTitle">Offres correspondantes</h2>
+    </div>
+    <div class="offers-list" id="offersList"><div class="loading">Chargement...</div></div>
+</section>
+
+<script>
+const API_BASE = 'http://localhost:8001';
+
+function getQueryParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('q') || '';
+}
+
+function performSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (q) window.location.href = `/offers?q=${encodeURIComponent(q)}`;
+}
+
+async function loadOffers() {
+    const q = getQueryParam();
+    const container = document.getElementById('offersList');
+    const title = document.getElementById('resultsTitle');
+
+    if (q) {
+        title.innerText = `Résultats pour "${q}"`;
+        document.getElementById('searchInput').value = q;
+    } else {
+        title.innerText = "Toutes les offres récentes";
+    }
+    container.innerHTML = '<div class="loading">Chargement...</div>';
+    try {
+        let url = `${API_BASE}/api/offers/recent?limit=30`;
+        if (q) url = `${API_BASE}/api/offers/search?q=${encodeURIComponent(q)}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.offers || data.offers.length === 0) {
+            container.innerHTML = '<div class="loading">Aucune offre trouvée</div>';
+            return;
+        }
+        container.innerHTML = data.offers.map(offre => renderOfferCard(offre)).join('');
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div class="loading">❌ Erreur : ${err.message}<br>Vérifiez l’API (port 8001).</div>`;
+    }
+}
+
+function renderOfferCard(offre) {
+    const titre = offre.titre_clean || offre.titre || 'Offre';
+    const entreprise = offre.entreprise || 'Entreprise';
+    const ville = offre.ville || 'Localisation non précisée';
+    const contrat = offre.type_contrat || 'CDI';
+    const salaire = offre.salaire_mensuel ? `${offre.salaire_mensuel.toLocaleString('fr-FR')}€/mois` : 'Salaire non indiqué';
+    const source = offre.source || 'source inconnue';
+    const tags = Array.isArray(offre.competences) ? offre.competences.slice(0,4) : [];
+    const score = offre.score_match || Math.floor(Math.random() * 30 + 65);
+    const initials = (entreprise.split(' ').slice(0,2).map(w=>w[0]).join('') || 'JO').toUpperCase();
+    const url = offre.url || '#';
+
+    return `
+    <div class="offer-card" onclick="window.open('${url}', '_blank')">
+        <div class="offer-logo">${initials}</div>
+        <div class="offer-info">
+            <div class="offer-title">${escapeHtml(titre)}</div>
+            <div class="offer-meta">${escapeHtml(entreprise)} · ${escapeHtml(ville)} · ${escapeHtml(contrat)}</div>
+            <div class="offer-tags">${tags.map(t => `<span class="offer-tag">${escapeHtml(t)}</span>`).join('')}</div>
+        </div>
+        <div class="offer-right">
+            <div class="offer-score">${score}%</div>
+            <div class="offer-score-bar"><div class="offer-score-fill" style="width:${score}%"></div></div>
+            <div class="offer-salary">${salaire}</div>
+            <span class="offer-source">${escapeHtml(source)}</span>
+        </div>
+    </div>`;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadOffers();
+    const input = document.getElementById('searchInput');
+    if (input) input.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+});
+
+(function updateNavbar() {
+    const token = localStorage.getItem('access_token');
+    const loginBtn = document.querySelector('.btn-login');
+    const signupBtn = document.querySelector('.btn-signup');
+    if (token && loginBtn) {
+        loginBtn.textContent = 'Mon compte';
+        loginBtn.href = '/profile';
+        if (signupBtn) signupBtn.style.display = 'none';
+    } else if (!token && loginBtn) {
+        loginBtn.textContent = 'Connexion';
+        loginBtn.href = '/login';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+    }
+})();
+</script>
+</body>
+</html>

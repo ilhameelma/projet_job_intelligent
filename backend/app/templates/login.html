@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Job Intelligent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 120px 24px 60px;
+        }
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+        }
+        .auth-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-light);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--white);
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+        .error-msg {
+            background: rgba(255,68,68,0.1);
+            color: #ff6666;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+            text-align: center;
+        }
+        .success-msg {
+            background: rgba(0,255,136,0.1);
+            color: var(--green);
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+            text-align: center;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--gray);
+        }
+        .auth-footer a {
+            color: var(--green);
+        }
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--green), var(--green-dim));
+            color: #000;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">Job<br>Intelligent</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link">Accueil</a></li>
+                <li><a href="/offers" class="nav-link">Offres</a></li>
+                <li><a href="/cv" class="nav-link">Mon CV</a></li>
+                <li><a href="/assistant" class="nav-link">Assistant IA</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="/login" class="btn-login active">Connexion</a>
+                <a href="/signup" class="btn-signup">Commencer gratuitement</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-title">🔐 Connexion</h1>
+            <p class="hero-subtitle" style="text-align: center; font-size: 14px; margin-bottom: 24px;">Accédez à votre espace personnalisé</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" required placeholder="exemple@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" required placeholder="Votre mot de passe">
+                </div>
+                <div id="errorMsg" class="error-msg"></div>
+                <div id="successMsg" class="success-msg"></div>
+                <button type="submit" class="btn-primary" id="submitBtn">Se connecter</button>
+            </form>
+            <div class="auth-footer">
+                Pas encore de compte ? <a href="/signup">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMsg');
+            const successDiv = document.getElementById('successMsg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Connexion en cours...';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, mot_de_passe: password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    let message = "Email ou mot de passe incorrect";
+                    if (res.status === 403) message = "Compte désactivé. Contactez l'administrateur.";
+                    throw new Error(message);
+                }
+
+                // Succès
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user_email', email);
+                
+                successDiv.textContent = "✅ Connexion réussie !";
+                successDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+                
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Se connecter';
+            }
+        });
+
+        if (localStorage.getItem('access_token')) {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

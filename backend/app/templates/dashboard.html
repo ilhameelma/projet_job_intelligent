@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Mon CV - Job Intelligent{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>📄 Mon CV - Analyse IA</h1>
+    <p>Uploadez votre CV, notre IA extrait automatiquement vos compétences et vous propose les 10 offres les mieux adaptées.</p>
+    
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📄</div>
+        <h3>Uploadez votre CV</h3>
+        <p>Formats acceptés : PDF, DOCX, TXT</p>
+        <input type="file" id="cvFile" accept=".pdf,.docx,.txt">
+        <button class="btn-upload" onclick="uploadCV()">📤 Analyser mon CV</button>
+    </div>
+    
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>🤖 Analyse de votre CV en cours...</p>
+    </div>
+    
+    <div id="results" style="display: none;">
+        <div class="skills-tag">
+            <h3>🎯 Compétences détectées</h3>
+            <div id="skillsList"></div>
+        </div>
+        
+        <h3>🎯 Offres recommandées pour votre profil</h3>
+        <div id="recommendationsList"></div>
+    </div>
+    
+    <div id="noCvMessage" style="display: none;">
+        <p>Vous n'avez pas encore analysé votre CV. Uploadez-le ci-dessus !</p>
+    </div>
+</div>
+
+<style>
+.dashboard-container { max-width: 1200px; margin: 0 auto; padding: 40px; }
+.upload-area { border: 3px dashed #ddd; border-radius: 20px; padding: 50px; text-align: center; cursor: pointer; margin: 30px 0; }
+.upload-area:hover { border-color: #667eea; background: #f8f9ff; }
+.btn-upload { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer; margin-top: 20px; }
+.skills-tag { background: #f0f0ff; padding: 20px; border-radius: 15px; margin: 20px 0; }
+.skill-badge { display: inline-block; background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; margin: 5px; }
+.offer-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid #667eea; }
+.offer-title { font-size: 18px; font-weight: bold; }
+.offer-score { background: #4caf50; color: white; padding: 4px 12px; border-radius: 20px; display: inline-block; }
+.offer-skills { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.offer-skill { background: #e0e0e8; padding: 4px 12px; border-radius: 15px; font-size: 12px; }
+</style>
+
+<script>
+async function uploadCV() {
+    const file = document.getElementById('cvFile').files[0];
+    if (!file) { alert('Sélectionnez un fichier'); return; }
+    
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const token = getCookie('access_token');
+    const response = await fetch('/api/recommendations/upload-cv', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+    });
+    
+    const data = await response.json();
+    document.getElementById('loading').style.display = 'none';
+    
+    if (data.success) {
+        displayResults(data);
+    } else {
+        alert('Erreur: ' + data.error);
+    }
+}
+
+function displayResults(data) {
+    const skillsList = document.getElementById('skillsList');
+    skillsList.innerHTML = data.skills.map(s => `<span class="skill-badge">${s}</span>`).join('');
+    
+    const offersList = document.getElementById('recommendationsList');
+    offersList.innerHTML = data.recommendations.map(offer => `
+        <div class="offer-card">
+            <div class="offer-title">${offer.titre || 'Offre'}</div>
+            <div class="offer-company">🏢 ${offer.entreprise}</div>
+            <div class="offer-details">
+                <span>📍 ${offer.ville || 'France'}</span>
+                <span>💰 ${offer.salaire_mensuel || '?'}€/mois</span>
+                <span>📄 ${offer.type_contrat}</span>
+                <span class="offer-score">${offer.score_match}% match</span>
+            </div>
+            <div class="offer-skills">
+                ${(offer.competences || []).map(s => `<span class="offer-skill">${s}</span>`).join('')}
+            </div>
+            <div class="offer-source">Source: ${offer.source}</div>
+        </div>
+    `).join('');
+    
+    document.getElementById('results').style.display = 'block';
+}
+
+// Charger les recommandations existantes
+async function loadRecommendations() {
+    const token = getCookie('access_token');
+    const response = await fetch('/api/recommendations/my-recommendations', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await response.json();
+    
+    if (data.has_cv) {
+        displayResults({ skills: data.skills, recommendations: data.recommendations });
+    } else {
+        document.getElementById('noCvMessage').style.display = 'block';
+    }
+}
+
+document.getElementById('uploadArea').onclick = function(e) {
+    if (e.target !== document.getElementById('cvFile')) {
+        document.getElementById('cvFile').click();
+    }
+};
+
+loadRecommendations();
+</script>
+{% endblock %}

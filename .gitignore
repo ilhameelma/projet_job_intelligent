@@ -116,4 +116,4 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-*.bak
+*.bakbackend/.env

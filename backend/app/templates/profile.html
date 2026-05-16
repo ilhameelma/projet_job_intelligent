@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil - Job Intelligent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 24px;
+        }
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+        .profile-field {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .profile-field label {
+            color: var(--green);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .profile-field p {
+            font-size: 18px;
+            margin: 0;
+        }
+        .btn-logout {
+            background: #ff4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .btn-logout:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .loading {
+            text-align: center;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo"><span class="logo-icon">⚡</span><span class="logo-text">Job<br>Intelligent</span></a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Accueil</a></li>
+            <li><a href="/offers" class="nav-link">Offres</a></li>
+            <li><a href="/cv" class="nav-link">Mon CV</a></li>
+            <li><a href="/assistant" class="nav-link">Assistant IA</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/profile" class="btn-login">Mon compte</a>
+            <a href="/signup" class="btn-signup" style="display:none;">Commencer gratuitement</a>
+        </div>
+    </div>
+</nav>
+
+<div class="profile-container">
+    <div class="profile-card">
+        <h1 class="hero-title" style="font-size: 36px;">Mon profil</h1>
+        <div class="loading" id="loadingMsg">Chargement...</div>
+        <div id="profileContent" style="display: none;">
+            <div class="profile-field">
+                <label>Email</label>
+                <p id="userEmail"></p>
+            </div>
+            <div class="profile-field">
+                <label>Nom complet</label>
+                <p id="userFullname"></p>
+            </div>
+            <button class="btn-logout" id="logoutBtn">Se déconnecter</button>
+        </div>
+        <div id="errorMsg" class="error-message"></div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8001';
+    const token = localStorage.getItem('access_token');
+    console.log('Token présent :', !!token);
+
+    const loadingDiv = document.getElementById('loadingMsg');
+    const contentDiv = document.getElementById('profileContent');
+    const errorDiv = document.getElementById('errorMsg');
+
+    if (!token) {
+        loadingDiv.style.display = 'none';
+        errorDiv.textContent = 'Vous n\'êtes pas connecté. Redirection...';
+        setTimeout(() => window.location.href = '/login', 2000);
+    } else {
+        fetch(`${API_BASE}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(async res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const user = await res.json();
+            console.log('Données utilisateur reçues :', user);
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userFullname').textContent = `${user.prenom} ${user.nom}`;
+            loadingDiv.style.display = 'none';
+            contentDiv.style.display = 'block';
+        })
+        .catch(err => {
+            console.error('Erreur fetch profil :', err);
+            loadingDiv.style.display = 'none';
+            errorDiv.textContent = `Erreur de chargement (${err.message}). Veuillez vous reconnecter.`;
+            localStorage.removeItem('access_token');
+            setTimeout(() => window.location.href = '/login', 3000);
+        });
+    }
+
+    // Déconnexion
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_BASE}/api/auth/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (err) {}
+            localStorage.removeItem('access_token');
+            window.location.href = '/';
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Intelligent{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='/'">Job<span>Intelligent</span></div>
+            <div class="nav-links">
+                <a href="/">Accueil</a>
+                <a href="/offres">Offres</a>
+                <a href="/dashboard">Mon CV</a>
+                <a href="/assistant">Assistant IA</a>
+                <a href="/alerts">Alertes</a>
+                <div id="auth-buttons">
+                    <button class="btn-outline" id="loginBtn">Connexion</button>
+                    <button class="btn-primary" id="signupBtn">Commencer gratuitement</button>
+                </div>
+                <div id="user-info" style="display: none;">
+                    <span id="userName"></span>
+                    <button class="btn-outline" id="logoutBtn">Déconnexion</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Job Intelligent — L'IA au service de votre carrière Data</p>
+            <p style="margin-top: 10px; font-size: 12px;">© 2026 Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Connexion</h2>
+            <form id="loginForm">
+                <div class="form-group"><input type="email" name="email" placeholder="Email" required></div>
+                <div class="form-group"><input type="password" name="password" placeholder="Mot de passe" required></div>
+                <button type="submit" class="form-btn">Se connecter</button>
+            </form>
+            <div class="form-footer">Pas encore de compte ? <a href="#" id="switchToSignup">S'inscrire</a></div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Inscription</h2>
+            <form id="signupForm">
+                <div class="form-group"><input type="text" name="name" placeholder="Nom complet" required></div>
+                <div class="form-group"><input type="email" name="email" placeholder="Email" required></div>
+                <div class="form-group"><input type="password" name="password" placeholder="Mot de passe (min 6)" required></div>
+                <button type="submit" class="form-btn">Créer mon compte</button>
+            </form>
+            <div class="form-footer">Déjà un compte ? <a href="#" id="switchToLogin">Se connecter</a></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Assistant IA - Job Intelligent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .chat-container { max-width: 800px; margin: 120px auto; padding: 0 24px; }
+        .chat-messages { background: var(--bg-card); border-radius: var(--radius); padding: 20px; height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { display: flex; gap: 12px; }
+        .message.user { justify-content: flex-end; }
+        .message-content { max-width: 70%; padding: 12px 16px; border-radius: 20px; background: var(--bg-card2); color: var(--white); white-space: pre-wrap; }
+        .message.user .message-content { background: var(--green); color: #000; }
+        .chat-input { display: flex; margin-top: 20px; gap: 12px; }
+        .chat-input input { flex: 1; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 30px; color: white; }
+        .chat-input button { background: var(--green); border: none; border-radius: 30px; padding: 12px 24px; font-weight: bold; cursor: pointer; }
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo"><span class="logo-icon">⚡</span><span class="logo-text">Job<br>Intelligent</span></a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Accueil</a></li>
+            <li><a href="/offers" class="nav-link">Offres</a></li>
+            <li><a href="/cv" class="nav-link">Mon CV</a></li>
+            <li><a href="/assistant" class="nav-link active">Assistant IA</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login" class="btn-login">Connexion</a>
+            <a href="/signup" class="btn-signup">Commencer gratuitement</a>
+        </div>
+    </div>
+</nav>
+
+<div class="chat-container">
+    <div id="chatInterface">
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                <div class="message-content">👋 Bonjour ! Je suis votre assistant IA.</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Ex: Quel est le salaire d'un Data Engineer ?">
+            <button onclick="sendMessage()">Envoyer</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = window.location.origin;
+    const token = localStorage.getItem('access_token');
+    
+    // 🔒 REDIRECTION VERS INSCRIPTION SI NON CONNECTÉ
+    if (!token) {
+        window.location.href = '/signup';
+    }
+    
+    async function sendMessage() {
+        const currentToken = localStorage.getItem('access_token');
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        addMessage(message, 'user');
+        input.value = '';
+        input.disabled = true;
+        const sendBtn = document.querySelector('.chat-input button');
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="loading-spinner"></span> Envoi...';
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/assistant/chat`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                },
+                body: JSON.stringify({ message })
+            });
+            const data = await res.json();
+            if (data.success) {
+                addMessage(data.response, 'ai');
+            } else {
+                addMessage("❌ Erreur lors de la communication avec l'assistant.", 'ai');
+            }
+        } catch (err) {
+            addMessage("❌ Impossible de contacter l'assistant. Veuillez réessayer.", 'ai');
+        } finally {
+            input.disabled = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'Envoyer';
+            input.focus();
+        }
+    }
+    
+    function addMessage(text, sender) {
+        const chatDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+        chatDiv.appendChild(messageDiv);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    document.getElementById('userInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+    
+    (function updateNavbar() {
+        const token = localStorage.getItem('access_token');
+        const loginBtn = document.querySelector('.btn-login');
+        const signupBtn = document.querySelector('.btn-signup');
+        if (token && loginBtn) {
+            loginBtn.textContent = 'Mon compte';
+            loginBtn.href = '/profile';
+            if (signupBtn) signupBtn.style.display = 'none';
+        }
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Intelligent - Trouvez votre poste Data avec l'IA</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- NAVBAR -->
+<!-- ============================================================ -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo"><span class="logo-icon">⚡</span><span class="logo-text">Job<br>Intelligent</span></a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link active">Accueil</a></li>
+            <li><a href="/offers" class="nav-link">Offres</a></li>
+            <li><a href="/cv" class="nav-link">Mon CV</a></li>
+            <li><a href="/assistant" class="nav-link">Assistant IA</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login" class="btn-login">Connexion</a>
+            <a href="/signup" class="btn-signup">Commencer gratuitement</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- HERO -->
+<!-- ============================================================ -->
+<section class="hero">
+    <h1 class="hero-title">Trouvez votre<br>poste <span class="highlight">Data</span><br>avec l'IA en<br>quelques secondes</h1>
+    <p class="hero-subtitle">Centralisation Adzuna · France Travail · WTTJ — analyse de votre CV<br>par IA — recommandations personnalisées</p>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Data Scientist" class="search-input">
+            <button class="search-btn" onclick="searchOffers()">🔍 Rechercher</button>
+        </div>
+        <div class="search-tags">
+            <button class="tag" onclick="quickSearch('Data Engineer')">Data Engineer</button>
+            <button class="tag" onclick="quickSearch('Data Scientist')">Data Scientist</button>
+            <button class="tag" onclick="quickSearch('ML Engineer')">ML Engineer</button>
+            <button class="tag" onclick="quickSearch('Analytics Engineer')">Analytics Engineer</button>
+            <button class="tag" onclick="quickSearch('CDI Paris')">CDI Paris</button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OFFRES RECOMMANDÉES -->
+<!-- ============================================================ -->
+<section class="section">
+    <div class="section-header">
+        <span class="section-tag">— RECOMMANDATIONS IA</span>
+        <h2 class="section-title">Offres recommandées</h2>
+    </div>
+    <div class="offers-list" id="offersList"><div class="loading">Chargement des offres...</div></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TOP COMPÉTENCES -->
+<!-- ============================================================ -->
+<section class="section section-dark">
+    <div class="section-header">
+        <span class="section-tag">— MARCHÉ DATA</span>
+        <h2 class="section-title">Compétences les plus demandées</h2>
+    </div>
+    <div class="skills-grid" id="skillsGrid"></div>
+</section>
+
+<footer class="footer">
+    <div class="footer-container">
+        <p class="footer-desc">Plateforme de recommandation d'offres Data propulsée par l'IA</p>
+        <div class="footer-links">
+            <a href="/offers">Offres</a>
+            <a href="/cv">Mon CV</a>
+            <a href="/assistant">Assistant IA</a>
+        </div>
+        <p class="footer-copy">© 2026 Job Intelligent — Tous droits réservés</p>
+    </div>
+</footer>
+
+<script src="/static/js/app.js"></script>
+<script>
+    // Mise à jour navbar
+    (function updateNavbar() {
+        const token = localStorage.getItem('access_token');
+        const loginBtn = document.querySelector('.btn-login');
+        const signupBtn = document.querySelector('.btn-signup');
+        if (token && loginBtn) {
+            loginBtn.textContent = 'Mon compte';
+            loginBtn.href = '/profile';
+            if (signupBtn) signupBtn.style.display = 'none';
+        } else if (!token && loginBtn) {
+            loginBtn.textContent = 'Connexion';
+            loginBtn.href = '/login';
+            if (signupBtn) signupBtn.style.display = 'inline-block';
+        }
+    })();
+</script>
+</body>
+</html>
