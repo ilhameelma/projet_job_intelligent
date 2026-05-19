@@ -4,7 +4,7 @@
 # =============================================================
 
 x-airflow-common: &airflow-common
-  # ✅ Image custom buildée depuis Dockerfile.airflow
+  # ✅ Image custom buildée depuis Dockerfile.airflowf
   build:
     context: .
     dockerfile: Dockerfile.airflow

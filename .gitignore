@@ -117,3 +117,4 @@ tmp/
 temp/
 *.tmp
 *.bakbackend/.env
+backend/.env
