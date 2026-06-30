@@ -488,6 +488,9 @@ GROUP BY c.nom ORDER BY nb DESC LIMIT 10;
 5. **Améliorer l'API NLP** — fine-tuning du scoring, prise en charge des soft skills
 
 ---
+👥 Auteur
+Samira EL YAAGOUBI
+Co-auteur : Ilhame EL METTICHI
 
 ## 📄 Licence
 
