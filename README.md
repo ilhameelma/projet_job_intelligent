@@ -18,7 +18,7 @@
 
 **Job Intelligent** est une plateforme de data engineering académique dédiée aux métiers de la Data (Data Engineering, Data Science, Data Analysis). Elle automatise la collecte d'offres d'emploi depuis plusieurs sources, les centralise dans un data warehouse structuré, et propose des recommandations personnalisées via NLP.
 
-**Réalisé par :** Ily & Ilhame El Mettichi  
+**Réalisé par :** Samira EL YAAGOUBI & Ilhame El Mettichi  
 **Encadrant :** Mme Fadwa Bouhafer
 
 ### Fonctionnalités clés
@@ -488,10 +488,6 @@ GROUP BY c.nom ORDER BY nb DESC LIMIT 10;
 5. **Améliorer l'API NLP** — fine-tuning du scoring, prise en charge des soft skills
 
 ---
-👥 Auteur
-Samira EL YAAGOUBI
-Co-auteur : Ilhame EL METTICHI
-
 ## 📄 Licence
 
 Projet académique — tous droits réservés.  
